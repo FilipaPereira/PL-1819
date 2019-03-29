@@ -2,27 +2,26 @@
     #include<stdio.h>
     #include<stdlib.h>
     #include<string.h>
+    FILE * file;
     char* nome="";
-    int len=0,len2=0;
 %}
 
 %x AUTOR
 %x NOME
-%x QUOTE1
-%x QUOTE2
+%x QUOTE
+%x PAGE
+%x TEXT
 
 %%
-"{{Autor"                                     {BEGIN AUTOR;}
-<AUTOR>"|"[ ]*("Nome"|"Nombre")[ ]*"="[ ]*    {BEGIN NOME;}
-<AUTOR>(.|\n)                                 {;}
-<NOME>[^\n]*                                  {nome = strdup(yytext); printf("--------\nAUTOR: %s \n",nome); BEGIN INITIAL;}
-^([*]&quot;)                                  {len = yyleng; BEGIN QUOTE1;}
-^([*][ ]&quot;)                               {len2 = yyleng; BEGIN QUOTE2;}
-<QUOTE1>.*&quot;[.]?[ ]?                      {yytext[yyleng-len+1]='\0';printf("%s\n",yytext);BEGIN INITIAL;}
-<QUOTE2>.*&quot;[.]?[ ]?                      {yytext[yyleng-len2+2]='\0';printf("%s\n",yytext);BEGIN INITIAL;}
-<QUOTE1>[^\n]*                                {printf("%s\n",yytext);BEGIN INITIAL;}
-<QUOTE2>[^\n]*                                {printf("%s\n",yytext);BEGIN INITIAL;}
-(.|\n)                                        {;}
+^([ ]*"<page>")                               {nome=""; BEGIN PAGE;}
+<PAGE>"<text".*"{{Autor"                      {BEGIN AUTOR;}
+<AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*        {BEGIN NOME;}
+<NOME>[^("|"|\n)]*                            {nome = strdup(yytext); printf("--------\nAUTOR: %s \n",nome); BEGIN INITIAL;}
+^([*][ ]*"&quot;")                            {BEGIN QUOTE;}
+<QUOTE>[^\n]*                                 {fprintf(file, "<p><b>%s</b>",nome);fprintf(file, " %s</p>\n",yytext);("%s\t QUOTE1\n",yytext); BEGIN INITIAL;}
+<AUTOR>^("[[Categoria")                       {BEGIN PAGE;}
+<PAGE>^([*][ ]*"&quot;")                      {BEGIN QUOTE;}
+<*>(.|\n)                                     {;}
 %%
 
 
@@ -31,10 +30,11 @@ int yywrap(){
 }
 
 int main(){
-
-    printf("Início da filtragem\n");
+    file = fopen("quotes.html","w");
+    fprintf(file, "<HTML> <BODY> <meta charset='UTF-8'/>");
     yylex();
-    printf("Fim da filtragem\n");
+    fprintf(file,"</BODY> </HTML>");
+    fclose(file);
 
     return 0;
 }
