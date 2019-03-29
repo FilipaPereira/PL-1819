@@ -2,25 +2,21 @@
     #include<stdio.h>
     #include<stdlib.h>
     #include<string.h>
-    char* nome="";
-    int conta1 = 0, conta2 = 0;
-%}
+    int conta = 0;
+    %}
 
-%x TRAD1
+%x TRAD
+%x QUOTE
 %x TRAD2
 
 %%
-[*]+[ ]*"''&quot;"[^\n]*                                    {BEGIN TRAD2; printf("Tipo 2: %s\n",yytext);}
-[*]+[ ]"&quot;"[^\n]*                                       {BEGIN TRAD1;printf("Tipo 1a: %s\n",yytext);}
-"* "[^.]*([:]*[-]?[ ]*("Tradução:"|"Tradução Literal:"))    {BEGIN TRAD1; printf("Tipo 1: %s\n",yytext);}
-<TRAD1>^([:][-]+[ ]?)[^\n]*									                {;}
-<TRAD2>^([*]*[:]?\ *("Tradução:"|"Tradução Literal:"))      {printf("Tipo 2: %s\n",yytext);}
-<TRAD1>^([:]*[-]?[ ]*("Tradução:"|"Tradução Literal:"))     {printf("Tipo 1: %s\n",yytext);}
-<TRAD2>[^\n]*                                               {printf("2----\n%s\n----\n",yytext); conta2++;BEGIN INITIAL;}
-<TRAD1>[^\n]*                                               {printf("1----\n%s\n----\n",yytext);conta1++; BEGIN INITIAL;}
-<TRAD2>(.|\n)                                               {;}
-<TRAD1>(.|\n)                                               {;}
-(.|\n)                                                      {;}
+\*.*\n[:]*[-]*[ ]*[']*(?i:("Tradução"|"Tradução literal"))[:]?[^\n]*  {printf("Encontrei uma tradução de tipo 1:\n%s\n\n",yytext); conta++;}
+\*" &quot;".*\n"**"[ ]?"Tradução:"[^\n]*                              {printf("Encontrei uma tradução de tipo 2:\n%s\n\n",yytext); conta++;}
+\*[ ]*"&quot;".*\n[*]*"Original"[ ]*[:]?[^\n]*                        {printf("Encontrei uma tradução de tipo 3:\n%s\n\n",yytext); conta++;}
+\*"* &quot".*\n"** &quot;"[^\n]*                                      {printf("Encontrei uma tradução de tipo 4:\n%s\n\n",yytext); conta++;}
+\*[ ]*[']{3}.*\n[*]{2}[ ]*[']{2}"Tradução"[^\n]*                      {printf("Encontrei uma tradução de tipo 5:\n%s\n\n",yytext); conta++;}
+\*" &quot;".*"&quot;"\n": "[A-Za-z][^\n]*                             {printf("Encontrei uma tradução de tipo 6:\n%s\n\n",yytext); conta++;}
+<*>(.|\n)                                                             {;}
 %%
 
 
@@ -29,12 +25,8 @@ int yywrap(){
 }
 
 int main(){
-
-    printf("Início da filtragem\n");
+    
     yylex();
-    printf("Fim da filtragem\n");
-    printf("Tipo 1: %d\n", conta1);
-    printf("Tipo 2: %d\n", conta2);
-
+    printf("Consegui ler %i traduções.\n",conta);
     return 0;
 }
