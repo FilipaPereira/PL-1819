@@ -14,7 +14,7 @@
 [*]" &quot;".*"&quot;"\n": "[A-Za-z][^\n]*                                 {printf("Encontrei uma tradução de tipo 6:\n%s\n\n",yytext); conta++;}
 [:].*[']{3}.*\n[:]+"Tradução literal"[^\n]*                                {printf("Encontrei uma tradução de tipo 7:\n%s\n\n",yytext); conta++;}
 [*].*\n[:][ ]"&lt;u&gt;"("Tradução"|"Literalmente")[:]"&lt;/u&gt;"[^\n]*   {printf("Encontrei uma tradução de tipo 8:\n%s\n\n",yytext); conta++;}
-<*>(.|\n)                                                                  {;}
+(.|\n)                                                                  {;}
 %%
 
 

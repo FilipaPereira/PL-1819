@@ -4,30 +4,43 @@
     #include<string.h>
     #include <glib.h>
     #include <ctype.h>
-    GHashTable* hash;
+    GHashTable* hash, *hash_quotes;
     FILE * file;
-    char* nome="";
-    int len=0,len2=0;
-    
+    FILE* indice;
+    FILE* traducoes;
+    FILE* autores;
+    FILE* page;
+    char* nome="", *auxnome="";
+    char filename[200];
+    int len=0;
+    char r[200];
+    char* filelink;
+
     gboolean printAutor(gpointer key, gpointer value, gpointer data);
     void insertAutor(char * autor);
-    void table();
+    void insertQuote(FILE* f, char* quote);
+    void tabelaAutor();
+    void removeSpaces(char *str);
 %}
 
 %x AUTOR
 %x NOME
 %x QUOTE
 %x PAGE
-%x TEXT
 
 %%
-^([ ]*"<page>")                              {nome=""; BEGIN PAGE;}
-<PAGE>"<text".*"{{Autor"                      {BEGIN AUTOR; len++;}
-<AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*    {BEGIN NOME;}
-<NOME>[^("|"|\n)]*                                  {nome = strdup(yytext); printf("--------\nAUTOR: %s \n",nome); BEGIN INITIAL;}
-^([*][ ]*"&quot;")                            {insertAutor(nome); BEGIN QUOTE;}
-<QUOTE>[^\n]*                            {yytext[yyleng-6]='\0'; printf("%s\t QUOTE1\n",yytext); BEGIN INITIAL;}
-<*>(.|\n)                                        {;}
+^([ ]*"<page>")                              { nome=""; BEGIN PAGE; }
+<PAGE>"<text".*"{{Autor"                     { BEGIN AUTOR; len++; }
+<AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*       { BEGIN NOME; }
+<NOME>[^("|"|\n)]*                           { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome); sprintf(filename,"autores/%s.html",auxnome); 
+                                                page = fopen(filename, "w+"); 
+                                                fprintf(page,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n"); 
+                                                BEGIN INITIAL; }
+^([*][ ]*"&quot;")                           { insertAutor(nome); BEGIN QUOTE; }
+<QUOTE>[^\n]*                                { insertQuote(page,yytext); BEGIN INITIAL; }
+<AUTOR>^("[[Categoria")                      { BEGIN PAGE; }
+<PAGE>^([*][ ]*"&quot;")                     { BEGIN QUOTE; }
+<*>(.|\n)                                    {;}
 %%
 
 
@@ -36,41 +49,68 @@ int yywrap(){
 }
 
 int main(){
+    indice = fopen("indice.html","w+");
+    autores = fopen("autores.html", "w+");
+    traducoes = fopen("traducoes.html", "w+");
     
     hash = g_hash_table_new(g_str_hash, g_str_equal);
-    file = fopen("html/estatisticas.html","w+");
     
     yylex();
-    fprintf(file, "<HTML> <BODY> <meta charset='UTF-8'/>");
-
-    table();
+    fprintf(indice,"%s","<html> <head> <meta charset='UTF-8'/>  <style> table, th, td { border: 1px solid black; border-collapse: collapse; } th, td { padding: 5px; } th { text-align: left; } </style> </head> <body>");
+    fprintf(indice,"<h1 align=\"center\"> Wiki Quotes </h1>\n<hr>");
+    fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","autores.html","Estatísticas de Autores");
+    fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","quotes.html","Lista de Citações");
+    fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","traducoes.html","Lista de Traducoes");
+    fprintf(autores, "<HTML> <BODY> <meta charset='UTF-8'/>");
+    fprintf(autores,"<h1 align=\"center\"> Autores </h1>\n<hr>");
+    tabelaAutor();
     g_hash_table_foreach(hash, printAutor, NULL);
-
-    fprintf(file, "</table>");
-
-    fprintf(file,"</BODY> </HTML>");
-    printf("\n------SIZE---\n %i\nlen %i\n",g_hash_table_size(hash),len);
-    fclose(file);
+    fprintf(autores, "</table>");
+	fprintf(autores,"</BODY> </HTML>");
+    fprintf(indice,"</BODY> </HTML>");
+	fclose(autores);
+    fclose(indice);
+    fclose(traducoes);
     
     return 0;
 }
 
-void table(){
-    fprintf(file, "<style>table, th, td { border: 1px solid black;} </style>");
-    fprintf(file, "<table>");
-    fprintf(file, "<tr>");
-    fprintf(file, "<th>Autor</th>");
-    fprintf(file, "<th>Numero de Citações</th>");
-    fprintf(file, "</tr>");
+
+
+// função auxiliar para remover espaços
+void removeSpaces(char *str){ 
+    int count = 0; 
+    for (int i = 0; str[i]; i++) 
+        if (str[i] != ' ') 
+            str[count++] = str[i]; 
+    str[count] = '\0'; 
+} 
+
+
+void tabelaAutor(){
+    fprintf(autores, "<style>table, th, td { border: 1px solid black;} </style>");
+    fprintf(autores, "<table>");
+    fprintf(autores, "<tr>");
+    fprintf(autores, "<th>Autor</th>");
+    fprintf(autores, "<th>Numero de Citações</th>");
+    fprintf(autores, "</tr>");
 }
 
+
 gboolean printAutor(gpointer key, gpointer value, gpointer data){
-    fprintf(file, "<tr>");
-    fprintf(file, "<td>%s</td>\n",key);
-    fprintf(file, "<td>%d</td>",*((int *)value));
-    fprintf(file, "</tr>");
+    filelink = (char*)malloc(sizeof(key));
+    strcpy(filelink,key);
+    removeSpaces(filelink);
+    strcat(filelink,".html");
+    sprintf(r,"<li><a href=%s> %s </a></li>",filelink,key);
+    fprintf(autores, "<HTML> <BODY> <meta charset='UTF-8'/>");
+    fprintf(autores, "<tr>");
+    fprintf(autores, "<td>%s</td>\n",r);
+	fprintf(autores, "<td>%d</td>",*((int *)value));
+    fprintf(autores, "</tr>");
     return FALSE;
 }
+
 
 void insertAutor(char * autor){
     gpointer value = g_hash_table_lookup(hash,autor);
@@ -87,3 +127,9 @@ void insertAutor(char * autor){
         (*n) = m;
     }
 }
+
+void insertQuote(FILE* f, char* quote){
+    fprintf(f,"<p><b>-</b>"); 
+    fprintf(f," %s</p>\n",quote);
+}
+

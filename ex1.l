@@ -33,6 +33,7 @@ int yywrap(){
 int main(){
     file = fopen("quotes.html","w");
     fprintf(file, "<HTML> <BODY> <meta charset='UTF-8'/>");
+    fprintf(file,"<h1 align=\"center\"> Citações </h1>\n<hr>");
     yylex();
     fprintf(file,"</BODY> </HTML>");
     fclose(file);
