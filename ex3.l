@@ -9,6 +9,7 @@
     FILE* indice;
     FILE* traducoes;
     FILE* autores;
+    FILE* quotes;
     FILE* page;
     char* nome="", *auxnome="";
     char filename[200];
@@ -52,7 +53,7 @@ int main(){
     indice = fopen("indice.html","w+");
     autores = fopen("autores.html", "w+");
     traducoes = fopen("traducoes.html", "w+");
-    
+    quotes = fopen("quotes.html", "w+");
     hash = g_hash_table_new(g_str_hash, g_str_equal);
     
     yylex();
@@ -71,7 +72,7 @@ int main(){
 	fclose(autores);
     fclose(indice);
     fclose(traducoes);
-    
+    fclose(quotes);
     return 0;
 }
 
