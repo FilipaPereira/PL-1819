@@ -30,7 +30,7 @@ int main(){
     fprintf(traducoes,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n");
     fprintf(traducoes,"<h1 align=\"center\"> Lista de Traduções </h1>\n<hr>");
     yylex();
-    sprintf(s,"Número de citações lidas: %i\n",conta);
+    sprintf(s,"Número de traduções lidas: %i\n",conta);
     fprintf(traducoes,"<h2> %s </h2>\n",s);
     fprintf(traducoes,"</BODY> </HTML>");
     fclose(traducoes);

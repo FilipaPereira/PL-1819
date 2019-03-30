@@ -4,19 +4,20 @@
     #include<string.h>
     #include <glib.h>
     #include <ctype.h>
-    GHashTable* hash, *hash_quotes;
+    GHashTable* hash;
     FILE * file;
     FILE* indice;
     FILE* traducoes;
     FILE* autores;
-    FILE* quotes;
     FILE* page;
     char* nome="", *auxnome="";
+    int conta = 0, ncits = 0;
+    char s[50];
     char filename[200];
     int len=0;
     char r[200];
     char* filelink;
-
+    void insertTranslation(FILE* f, char* t);
     gboolean printAutor(gpointer key, gpointer value, gpointer data);
     void insertAutor(char * autor);
     void insertQuote(FILE* f, char* quote);
@@ -38,9 +39,18 @@
                                                 fprintf(page,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n"); 
                                                 BEGIN INITIAL; }
 ^([*][ ]*"&quot;")                           { insertAutor(nome); BEGIN QUOTE; }
-<QUOTE>[^\n]*                                { insertQuote(page,yytext); BEGIN INITIAL; }
+<QUOTE>[^\n]*                                { insertQuote(page,yytext); fprintf(file,"<p><b>%s</b>",nome); 
+                                                fprintf(file," %s</p>\n",yytext); ncits++; BEGIN INITIAL; }
 <AUTOR>^("[[Categoria")                      { BEGIN PAGE; }
 <PAGE>^([*][ ]*"&quot;")                     { BEGIN QUOTE; }
+[*].*\n[:]*[-]*[ ]*[']*(?i:("Tradução"|"Tradução literal"))[:]?[^\n]*      {insertTranslation(traducoes,yytext); conta++;}
+[*]" &quot;".*\n"**"[ ]?"Tradução:"[^\n]*                                  {insertTranslation(traducoes,yytext); conta++;}
+[*][ ]*"&quot;".*\n[*]*"Original"[ ]*[:]?[^\n]*                            {insertTranslation(traducoes,yytext); conta++;}
+[*][ ]?.*\n[*]{2}[']{2}"Tradução''"[:][^\n]*                               {insertTranslation(traducoes,yytext); conta++;}
+[*][ ]*[']{3}.*\n[*]{2}[ ]*[']{2}"Tradução"[^\n]*                          {insertTranslation(traducoes,yytext); conta++;}
+[*]" &quot;".*"&quot;"\n": "[A-Za-z][^\n]*                                 {insertTranslation(traducoes,yytext); conta++;}
+[:].*[']{3}.*\n[:]+"Tradução literal"[^\n]*                                {insertTranslation(traducoes,yytext); conta++;}
+[*].*\n[:][ ]"&lt;u&gt;"("Tradução"|"Literalmente")[:]"&lt;/u&gt;"[^\n]*   {insertTranslation(traducoes,yytext); conta++;}
 <*>(.|\n)                                    {;}
 %%
 
@@ -49,9 +59,19 @@ int yywrap(){
     return 1;
 }
 
+
 int main(){
     indice = fopen("indice.html","w+");
     autores = fopen("autores.html", "w+");
+    file = fopen("quotes.html","w");
+    traducoes = fopen("traducoes.html", "w+");
+
+    fprintf(file, "<HTML> <BODY> <meta charset='UTF-8'/>");
+    fprintf(file,"<h1 align=\"center\"> Citações </h1>\n<hr>");
+    
+    fprintf(traducoes,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n");
+    fprintf(traducoes,"<h1 align=\"center\"> Lista de Traduções </h1>\n<hr>");
+
     hash = g_hash_table_new(g_str_hash, g_str_equal);
     
     yylex();
@@ -60,6 +80,12 @@ int main(){
     fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","autores.html","Estatísticas de Autores");
     fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","quotes.html","Lista de Citações");
     fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","traducoes.html","Lista de Traducoes");
+    sprintf(s,"Número de traduções lidas: %i\n",conta);
+    fprintf(indice,"<h3> %s </h3>\n",s);
+    sprintf(s,"Número de autores lidos: %i\n",len);
+    fprintf(indice,"<h3> %s </h3>\n",s);
+    sprintf(s,"Número de citações lidas: %i\n",ncits);
+    fprintf(indice,"<h3> %s </h3>\n",s);
     fprintf(autores, "<HTML> <BODY> <meta charset='UTF-8'/>");
     fprintf(autores,"<h1 align=\"center\"> Autores </h1>\n<hr>");
     tabelaAutor();
@@ -67,6 +93,10 @@ int main(){
     fprintf(autores, "</table>");
 	fprintf(autores,"</BODY> </HTML>");
     fprintf(indice,"</BODY> </HTML>");
+    fprintf(file,"</BODY> </HTML>");
+    fprintf(traducoes,"</BODY> </HTML>");
+    fclose(traducoes);
+    fclose(file);
 	fclose(autores);
     fclose(indice);
     return 0;
@@ -83,6 +113,9 @@ void removeSpaces(char *str){
     str[count] = '\0'; 
 } 
 
+void insertTranslation(FILE* f, char* t){
+    fprintf(f,"<p>%s</p>\n",t);
+}
 
 void tabelaAutor(){
     fprintf(autores, "<style>table, th, td { border: 1px solid black;} </style>");
