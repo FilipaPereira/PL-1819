@@ -11,8 +11,8 @@
     FILE* page;
     char* nome="", *auxnome="";
     int conta = 0, ncits = 0, len=0, c=0;
-    char filename[200], r[200], s[50];
-    char* filelink;
+    char filename[10*1024], r[10*1024], s[10*1024];
+    char * filelink;
     void insertTranslation(FILE* f, char* t);
     gboolean printAutor(gpointer key, gpointer value, gpointer data);
     void insertAutor(char * autor);
@@ -34,6 +34,7 @@
 <NOME>[^("|"|\n)]*                                                          { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome); sprintf(filename,"autores/%s.html",auxnome); 
                                                                                 page = fopen(filename, "w+"); 
                                                                                 fprintf(page,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n"); 
+                                                                                fprintf(page,"<h1 align=\"center\"> %s </h1>\n<hr>", nome);
                                                                                 BEGIN INITIAL; }
 ^([*][ ]*"&quot;")                                                          { insertAutor(nome); BEGIN QUOTE; }
 <QUOTE>[^\n]*                                                               { insertQuote(page,yytext); fprintf(file,"<p><b>%s</b>",nome); 
@@ -113,14 +114,11 @@ void tabelaAutor(){
 
 
 gboolean printAutor(gpointer key, gpointer value, gpointer data){
-    filelink = (char*)malloc(sizeof(key));
-    char aux[100];
+    char aux[10*1024];
     c++;
-    strcpy(aux,"autores/");
-    strcpy(filelink,key);
+    filelink = strdup(key);
     removeSpaces(filelink);
-    strcat(filelink,".html");
-    strcat(aux,filelink);
+    sprintf(aux,"autores/%s.html",filelink);
     sprintf(r,"<li><a href=%s> %s </a></li>",aux,key);
     fprintf(autores, "<HTML> <BODY> <meta charset='UTF-8'/>");
     fprintf(autores, "<tr>");
