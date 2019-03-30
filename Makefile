@@ -13,3 +13,13 @@ estatisticas: ex3.l
 	flex ex3.l
 	cc lex.yy.c -o estatisticas `pkg-config --cflags --libs glib-2.0`
 
+clean:
+	rm -f lex.yy.c
+	rm -f citacoes
+	rm -f traducoes
+	rm -f estatisticas
+	rm -rf autores/
+	rm -f quotes.html
+	rm -f traducoes.html
+	rm -f autores.html
+	rm -f indice.html
