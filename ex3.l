@@ -28,17 +28,17 @@
 %x PAGE
 
 %%
-^([ ]*"<page>")                                                             { nome=""; BEGIN PAGE; }
+^([ ]*"<page>")                                                             { fclose(page); nome=""; BEGIN PAGE; }
 <PAGE>"<text".*"{{Autor"                                                    { BEGIN AUTOR; len++; }
 <AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*                                      { BEGIN NOME; }
-<NOME>[^("|"|\n)]*                                                          { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome); sprintf(filename,"autores/%s.html",auxnome); 
-                                                                                page = fopen(filename, "w+"); 
+<NOME>[^("|"|\n)]*                                                          { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome); 
+                                                                                sprintf(filename,"autores/%s.html",auxnome); 
+                                                                                page = fopen(filename, "w+");
                                                                                 fprintf(page,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n"); 
                                                                                 fprintf(page,"<h1 align=\"center\"> %s </h1>\n<hr>", nome);
                                                                                 BEGIN INITIAL; }
-^([*][ ]*"&quot;")                                                          { insertAutor(nome); BEGIN QUOTE; }
-<QUOTE>[^\n]*                                                               { insertQuote(page,yytext); fprintf(file,"<p><b>%s</b>",nome); 
-                                                                                fprintf(file," %s</p>\n",yytext); ncits++; BEGIN INITIAL; }
+^([*][ ]*"&quot;")                                                          { if(nome) insertAutor(nome); BEGIN QUOTE; }
+<QUOTE>[^\n]*                                                               { if(page) insertQuote(page,yytext); ncits++; BEGIN INITIAL; }
 <AUTOR>^("[[Categoria")                                                     { BEGIN PAGE; }
 <PAGE>^([*][ ]*"&quot;")                                                    { BEGIN QUOTE; }
 <*>(.|\n)                                                                   { ; }
@@ -53,10 +53,6 @@ int yywrap(){
 int main(){
     indice = fopen("indice.html","w+");
     autores = fopen("autores.html", "w+");
-    file = fopen("quotes.html","w");
-
-    fprintf(file, "<HTML> <BODY> <meta charset='UTF-8'/>");
-    fprintf(file,"<h1 align=\"center\"> Citações </h1>\n<hr>");
     
 
     hash = g_hash_table_new(g_str_hash, g_str_equal);
@@ -81,8 +77,6 @@ int main(){
     fprintf(autores, "</table>");
 	fprintf(autores,"</BODY> </HTML>");
     fprintf(indice,"</BODY> </HTML>");
-    fprintf(file,"</BODY> </HTML>");
-    fclose(file);
 	fclose(autores);
     fclose(indice);
     return 0;
