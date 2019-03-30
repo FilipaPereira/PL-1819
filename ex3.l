@@ -52,8 +52,6 @@ int yywrap(){
 int main(){
     indice = fopen("indice.html","w+");
     autores = fopen("autores.html", "w+");
-    traducoes = fopen("traducoes.html", "w+");
-    quotes = fopen("quotes.html", "w+");
     hash = g_hash_table_new(g_str_hash, g_str_equal);
     
     yylex();
@@ -71,8 +69,6 @@ int main(){
     fprintf(indice,"</BODY> </HTML>");
 	fclose(autores);
     fclose(indice);
-    fclose(traducoes);
-    fclose(quotes);
     return 0;
 }
 
