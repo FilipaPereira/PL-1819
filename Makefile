@@ -1,4 +1,5 @@
 all: citacoes traducoes estatisticas
+	mkdir -p autores
 
 citacoes: ex1.l
 	flex ex1.l

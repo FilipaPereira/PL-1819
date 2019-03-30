@@ -7,15 +7,11 @@
     GHashTable* hash;
     FILE * file;
     FILE* indice;
-    FILE* traducoes;
     FILE* autores;
     FILE* page;
     char* nome="", *auxnome="";
-    int conta = 0, ncits = 0;
-    char s[50];
-    char filename[200];
-    int len=0;
-    char r[200];
+    int conta = 0, ncits = 0, len=0, c=0;
+    char filename[200], r[200], s[50];
     char* filelink;
     void insertTranslation(FILE* f, char* t);
     gboolean printAutor(gpointer key, gpointer value, gpointer data);
@@ -23,6 +19,7 @@
     void insertQuote(FILE* f, char* quote);
     void tabelaAutor();
     void removeSpaces(char *str);
+    int contaLinhas(char* filename);
 %}
 
 %x AUTOR
@@ -31,27 +28,19 @@
 %x PAGE
 
 %%
-^([ ]*"<page>")                              { nome=""; BEGIN PAGE; }
-<PAGE>"<text".*"{{Autor"                     { BEGIN AUTOR; len++; }
-<AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*       { BEGIN NOME; }
-<NOME>[^("|"|\n)]*                           { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome); sprintf(filename,"autores/%s.html",auxnome); 
-                                                page = fopen(filename, "w+"); 
-                                                fprintf(page,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n"); 
-                                                BEGIN INITIAL; }
-^([*][ ]*"&quot;")                           { insertAutor(nome); BEGIN QUOTE; }
-<QUOTE>[^\n]*                                { insertQuote(page,yytext); fprintf(file,"<p><b>%s</b>",nome); 
-                                                fprintf(file," %s</p>\n",yytext); ncits++; BEGIN INITIAL; }
-<AUTOR>^("[[Categoria")                      { BEGIN PAGE; }
-<PAGE>^([*][ ]*"&quot;")                     { BEGIN QUOTE; }
-[*].*\n[:]*[-]*[ ]*[']*(?i:("Tradução"|"Tradução literal"))[:]?[^\n]*      {insertTranslation(traducoes,yytext); conta++;}
-[*]" &quot;".*\n"**"[ ]?"Tradução:"[^\n]*                                  {insertTranslation(traducoes,yytext); conta++;}
-[*][ ]*"&quot;".*\n[*]*"Original"[ ]*[:]?[^\n]*                            {insertTranslation(traducoes,yytext); conta++;}
-[*][ ]?.*\n[*]{2}[']{2}"Tradução''"[:][^\n]*                               {insertTranslation(traducoes,yytext); conta++;}
-[*][ ]*[']{3}.*\n[*]{2}[ ]*[']{2}"Tradução"[^\n]*                          {insertTranslation(traducoes,yytext); conta++;}
-[*]" &quot;".*"&quot;"\n": "[A-Za-z][^\n]*                                 {insertTranslation(traducoes,yytext); conta++;}
-[:].*[']{3}.*\n[:]+"Tradução literal"[^\n]*                                {insertTranslation(traducoes,yytext); conta++;}
-[*].*\n[:][ ]"&lt;u&gt;"("Tradução"|"Literalmente")[:]"&lt;/u&gt;"[^\n]*   {insertTranslation(traducoes,yytext); conta++;}
-<*>(.|\n)                                    {;}
+^([ ]*"<page>")                                                             { nome=""; BEGIN PAGE; }
+<PAGE>"<text".*"{{Autor"                                                    { BEGIN AUTOR; len++; }
+<AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*                                      { BEGIN NOME; }
+<NOME>[^("|"|\n)]*                                                          { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome); sprintf(filename,"autores/%s.html",auxnome); 
+                                                                                page = fopen(filename, "w+"); 
+                                                                                fprintf(page,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n"); 
+                                                                                BEGIN INITIAL; }
+^([*][ ]*"&quot;")                                                          { insertAutor(nome); BEGIN QUOTE; }
+<QUOTE>[^\n]*                                                               { insertQuote(page,yytext); fprintf(file,"<p><b>%s</b>",nome); 
+                                                                                fprintf(file," %s</p>\n",yytext); ncits++; BEGIN INITIAL; }
+<AUTOR>^("[[Categoria")                                                     { BEGIN PAGE; }
+<PAGE>^([*][ ]*"&quot;")                                                    { BEGIN QUOTE; }
+<*>(.|\n)                                                                   { ; }
 %%
 
 
@@ -64,13 +53,10 @@ int main(){
     indice = fopen("indice.html","w+");
     autores = fopen("autores.html", "w+");
     file = fopen("quotes.html","w");
-    traducoes = fopen("traducoes.html", "w+");
 
     fprintf(file, "<HTML> <BODY> <meta charset='UTF-8'/>");
     fprintf(file,"<h1 align=\"center\"> Citações </h1>\n<hr>");
     
-    fprintf(traducoes,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n");
-    fprintf(traducoes,"<h1 align=\"center\"> Lista de Traduções </h1>\n<hr>");
 
     hash = g_hash_table_new(g_str_hash, g_str_equal);
     
@@ -80,22 +66,21 @@ int main(){
     fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","autores.html","Estatísticas de Autores");
     fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","quotes.html","Lista de Citações");
     fprintf(indice,"<li> <a href='%s'> %s </a></li>\n","traducoes.html","Lista de Traducoes");
-    sprintf(s,"Número de traduções lidas: %i\n",conta);
-    fprintf(indice,"<h3> %s </h3>\n",s);
-    sprintf(s,"Número de autores lidos: %i\n",len);
-    fprintf(indice,"<h3> %s </h3>\n",s);
-    sprintf(s,"Número de citações lidas: %i\n",ncits);
-    fprintf(indice,"<h3> %s </h3>\n",s);
     fprintf(autores, "<HTML> <BODY> <meta charset='UTF-8'/>");
     fprintf(autores,"<h1 align=\"center\"> Autores </h1>\n<hr>");
     tabelaAutor();
     g_hash_table_foreach(hash, printAutor, NULL);
+    sprintf(s,"Número de autores lidos: %i\n",len);
+    fprintf(indice,"<h4> %s </h4>\n",s);
+    sprintf(s,"Número de autores com citações: %i\n",c);
+    fprintf(indice,"<h4> %s </h4>\n",s);
+    sprintf(s,"Número de citações lidas: %i\n",ncits);
+    fprintf(indice,"<h4> %s </h4>\n",s);
+
     fprintf(autores, "</table>");
 	fprintf(autores,"</BODY> </HTML>");
     fprintf(indice,"</BODY> </HTML>");
     fprintf(file,"</BODY> </HTML>");
-    fprintf(traducoes,"</BODY> </HTML>");
-    fclose(traducoes);
     fclose(file);
 	fclose(autores);
     fclose(indice);
@@ -129,10 +114,14 @@ void tabelaAutor(){
 
 gboolean printAutor(gpointer key, gpointer value, gpointer data){
     filelink = (char*)malloc(sizeof(key));
+    char aux[100];
+    c++;
+    strcpy(aux,"autores/");
     strcpy(filelink,key);
     removeSpaces(filelink);
     strcat(filelink,".html");
-    sprintf(r,"<li><a href=%s> %s </a></li>",filelink,key);
+    strcat(aux,filelink);
+    sprintf(r,"<li><a href=%s> %s </a></li>",aux,key);
     fprintf(autores, "<HTML> <BODY> <meta charset='UTF-8'/>");
     fprintf(autores, "<tr>");
     fprintf(autores, "<td>%s</td>\n",r);
