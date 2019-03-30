@@ -6,8 +6,8 @@
 How to:
 1. On the project directory, run "make" command.
 2. Run the programs by the following order (citacoes and traducoes can switch order, but estatisticas must be last):
-    > ./citacoes
-    > ./traducoes
-    > ./estatisticas
+    - ./citacoes < inputtext.txt
+    - ./traducoes < inputtext.txt
+    - ./estatisticas < inputtext.txt
 3. All done!
 
