@@ -8,7 +8,7 @@
     FILE * file;
     FILE* indice;
     FILE* autores;
-    FILE* page;
+    FILE* page = NULL;
     char* nome="", *auxnome="";
     int conta = 0, ncits = 0, len=0, c=0;
     char filename[10*1024], r[10*1024], s[10*1024];
@@ -28,19 +28,20 @@
 %x PAGE
 
 %%
-^([ ]*"<page>")                                                             { fclose(page); nome=""; BEGIN PAGE; }
-<PAGE>"<text".*"{{Autor"                                                    { BEGIN AUTOR; len++; }
-<AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*                                      { BEGIN NOME; }
-<NOME>[^("|"|\n)]*                                                          { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome); 
-                                                                                sprintf(filename,"autores/%s.html",auxnome); 
+^([ ]*"<page>")                                                             {if(page) fclose(page);page=NULL; perror("Error");nome=""; BEGIN PAGE; }
+<PAGE>"<text".*"{{Autor"                                                    { BEGIN AUTOR; len++;}
+<AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*                                      { BEGIN NOME;}
+<NOME>[^("|"|\n)]*                                                          { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome);
+                                                                                printf("Nome:%s\n",nome);
+                                                                                sprintf(filename,"autores/%s.html",auxnome);
                                                                                 page = fopen(filename, "w+");
-                                                                                fprintf(page,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n"); 
-                                                                                fprintf(page,"<h1 align=\"center\"> %s </h1>\n<hr>", nome);
-                                                                                BEGIN INITIAL; }
-^([*][ ]*"&quot;")                                                          { if(nome) insertAutor(nome); BEGIN QUOTE; }
-<QUOTE>[^\n]*                                                               { if(page) insertQuote(page,yytext); ncits++; BEGIN INITIAL; }
-<AUTOR>^("[[Categoria")                                                     { BEGIN PAGE; }
-<PAGE>^([*][ ]*"&quot;")                                                    { BEGIN QUOTE; }
+                                                                                if(page){
+                                                                                fprintf(page,"<html><head><meta charset='UTF-8'/>\n </head><body><ul>\n");
+                                                                                fprintf(page,"<h1 align=\"center\"> %s </h1>\n<hr>", nome);}
+                                                                                BEGIN INITIAL;}
+<AUTOR>^([*][ ]*"&quot;")                                                          { if(nome) insertAutor(nome); BEGIN QUOTE; }
+<QUOTE>[^\n]*                                                               { if(page) {insertQuote(page,yytext);} else {printf("NAO TEM page\n");} ncits++; BEGIN INITIAL; }
+<PAGE>^([*][ ]*"&quot;")                                                    { printf("NAO TEM AUTOR\n");BEGIN QUOTE; }
 <*>(.|\n)                                                                   { ; }
 %%
 
@@ -53,10 +54,10 @@ int yywrap(){
 int main(){
     indice = fopen("indice.html","w+");
     autores = fopen("autores.html", "w+");
-    
+
 
     hash = g_hash_table_new(g_str_hash, g_str_equal);
-    
+
     yylex();
     fprintf(indice,"%s","<html> <head> <meta charset='UTF-8'/>  <style> table, th, td { border: 1px solid black; border-collapse: collapse; } th, td { padding: 5px; } th { text-align: left; } </style> </head> <body>");
     fprintf(indice,"<h1 align=\"center\"> Wiki Quotes </h1>\n<hr>");
@@ -85,13 +86,13 @@ int main(){
 
 
 // função auxiliar para remover espaços
-void removeSpaces(char *str){ 
-    int count = 0; 
-    for (int i = 0; str[i]; i++) 
-        if (str[i] != ' ') 
-            str[count++] = str[i]; 
-    str[count] = '\0'; 
-} 
+void removeSpaces(char *str){
+    int count = 0;
+    for (int i = 0; str[i]; i++)
+        if (str[i] != ' ')
+            str[count++] = str[i];
+    str[count] = '\0';
+}
 
 void insertTranslation(FILE* f, char* t){
     fprintf(f,"<p>%s</p>\n",t);
@@ -140,7 +141,6 @@ void insertAutor(char * autor){
 }
 
 void insertQuote(FILE* f, char* quote){
-    fprintf(f,"<p><b>-</b>"); 
+    fprintf(f,"<p><b>-</b>");
     fprintf(f," %s</p>\n",quote);
 }
-

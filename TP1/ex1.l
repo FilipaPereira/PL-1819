@@ -20,7 +20,6 @@
 ^([*][ ]*"&quot;")                        { BEGIN QUOTE;}
 <QUOTE>[^\n]*                             { fprintf(file,"<p><b>%s</b>",nome); fprintf(file," %s</p>\n",yytext);
                                             BEGIN INITIAL; }
-<AUTOR>^("[[Categoria")                   { BEGIN PAGE; }
 <PAGE>^([*][ ]*"&quot;")                  { BEGIN QUOTE; }
 <*>(.|\n)                                 {;}
 %%
