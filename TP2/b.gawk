@@ -1,6 +1,7 @@
 BEGIN                                   { RS="\nNIL"; FS=";"}
-                                {print $2 ";" $3 ";" $4 ";" $5 > "registos.csv"}
-END                                     { print "Registos Lidos;"(NR-1) > "registos.csv"}
+NR==1                                   {print "#Registo;" $2 ";" $3 ";" $4 ";" $5 > "registos.csv"; i++}
+NR>1                                    {print i ";" $2 ";" $3 ";" $4 ";" $5 > "registos.csv"; i++}
+END                                     { }
 
 
 
