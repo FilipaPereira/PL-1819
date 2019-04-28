@@ -17,7 +17,7 @@ c:
 d: 
 	gawk -f d.gawk processado.csv
 
-E: 
+e: 
 	gawk -f e.gawk processado.csv
 
 clean:
