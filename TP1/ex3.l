@@ -28,7 +28,7 @@
 %x PAGE
 
 %%
-^([ ]*"<page>")                           { if(page) { fclose(page); page=NULL;} nome=""; BEGIN PAGE; }
+^([ ]*"<page>")                           { if(page) { fclose(page); page = NULL; } nome=""; BEGIN PAGE; }
 <PAGE>"<text".*"{{Autor"                  { BEGIN AUTOR; len++; }
 <AUTOR>"|"[ ]*("Wikipedia")[ ]*"="[ ]*    { BEGIN NOME; }
 <NOME>[^("|"|\n)]*                        { nome = strdup(yytext); auxnome = strdup(nome); removeSpaces(auxnome);

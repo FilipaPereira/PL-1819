@@ -9,7 +9,7 @@ NR > 1            { split($8, array, /[#][\n\t\r]+/);
                         for(i in array2){
                             gsub(/\"/,"",array2[i]);
                             if(array2[i]!="")
-                                print "\x22" $2 "\x22 -- \x22" array2[i] "\x22;" > "grafo.dot";
+                                print " \" " $2 " \"  -- \" " array2[i] "\x22;" > "grafo.dot";
                     }
                   }
 END               { print "}" > "grafo.dot" }
