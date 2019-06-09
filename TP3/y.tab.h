@@ -1,13 +1,14 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 2.3.  */
 
-/* Bison interface for Yacc-like parsers in C
+/* Skeleton interface for Bison's Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,7 +16,9 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -30,66 +33,68 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
-/* Debug traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 0
-#endif
-#if YYDEBUG
-extern int yydebug;
-#endif
-
-/* Token type.  */
+/* Tokens.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-  enum yytokentype
-  {
-    START = 258,
-    JSON = 259,
-    YAML = 260,
-    OBJECT = 261,
-    PARAGRAPH = 262,
-    CONTENT = 263,
-    COLON = 264,
-    COMMA = 265,
-    lista = 266,
-    blockline = 267,
-    KEYVALUE = 268
-  };
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     START = 258,
+     JSON = 259,
+     YAML = 260,
+     OBJECT = 261,
+     KEY = 262,
+     PARAGRAPH = 263,
+     CONTENT = 264,
+     COLON = 265,
+     COMMA = 266,
+     NULLVALUE = 267,
+     BOOLEAN = 268,
+     BOOLVALUE = 269,
+     ARRAY = 270,
+     ARRAYKEY = 271,
+     ARRAYVALUE = 272,
+     list = 273,
+     array = 274,
+     blockline = 275,
+     KEYVALUE = 276
+   };
 #endif
 /* Tokens.  */
 #define START 258
 #define JSON 259
 #define YAML 260
 #define OBJECT 261
-#define PARAGRAPH 262
-#define CONTENT 263
-#define COLON 264
-#define COMMA 265
-#define lista 266
-#define blockline 267
-#define KEYVALUE 268
+#define KEY 262
+#define PARAGRAPH 263
+#define CONTENT 264
+#define COLON 265
+#define COMMA 266
+#define NULLVALUE 267
+#define BOOLEAN 268
+#define BOOLVALUE 269
+#define ARRAY 270
+#define ARRAYKEY 271
+#define ARRAYVALUE 272
+#define list 273
+#define array 274
+#define blockline 275
+#define KEYVALUE 276
 
-/* Value type.  */
+
+
+
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
-union YYSTYPE
-{
-#line 10 "yaml.y" /* yacc.c:1909  */
-char* str; char* keyvalue;
-
-#line 83 "y.tab.h" /* yacc.c:1909  */
-};
-
-typedef union YYSTYPE YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
+typedef union YYSTYPE
+#line 10 "yaml.y"
+{char* str; char* keyvalue;}
+/* Line 1529 of yacc.c.  */
+#line 93 "y.tab.h"
+	YYSTYPE;
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
-
 
 extern YYSTYPE yylval;
 
-int yyparse (void);
-
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

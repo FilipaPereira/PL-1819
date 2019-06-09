@@ -1,14 +1,17 @@
-Terminals unused in grammar
+Terminals which are not used
 
    JSON
    YAML
    COLON
    COMMA
+   array
 
 
-State 3 conflicts: 4 shift/reduce
-State 11 conflicts: 3 shift/reduce
-State 12 conflicts: 1 shift/reduce
+State 3 conflicts: 5 shift/reduce
+State 4 conflicts: 5 shift/reduce
+State 13 conflicts: 4 shift/reduce
+State 14 conflicts: 1 shift/reduce
+State 15 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -20,18 +23,27 @@ Grammar
     2 KeyValuePairs: KeyValuePair
     3              | KeyValuePairs KeyValuePair
 
-    4 KeyValuePair: OBJECT Value
+    4 KeyValuePair: KEY Value
     5             | PARAGRAPH Block
     6             | CONTENT Block
+    7             | OBJECT Value
 
-    7 Value: %empty
-    8      | lista
-    9      | Value lista
-   10      | KEYVALUE
-   11      | KeyValuePairs
+    8 Value: /* empty */
+    9      | list
+   10      | Value list
+   11      | KEYVALUE
+   12      | ARRAY Array
+   13      | KeyValuePairs
 
-   12 Block: blockline
-   13      | Block blockline
+   14 Block: blockline
+   15      | Block blockline
+
+   16 Array: Entry
+   17      | Array Entry
+
+   18 Entry: NULLVALUE
+   19      | BOOLEAN BOOLVALUE
+   20      | ARRAYKEY ARRAYVALUE
 
 
 Terminals, with rules where they appear
@@ -41,33 +53,45 @@ error (256)
 START (258) 1
 JSON (259)
 YAML (260)
-OBJECT (261) 4
-PARAGRAPH (262) 5
-CONTENT (263) 6
-COLON (264)
-COMMA (265)
-lista (266) 8 9
-blockline (267) 12 13
-KEYVALUE (268) 10
+OBJECT (261) 7
+KEY (262) 4
+PARAGRAPH (263) 5
+CONTENT (264) 6
+COLON (265)
+COMMA (266)
+NULLVALUE (267) 18
+BOOLEAN (268) 19
+BOOLVALUE (269) 19
+ARRAY (270) 12
+ARRAYKEY (271) 20
+ARRAYVALUE (272) 20
+list (273) 9 10
+array (274)
+blockline (275) 14 15
+KEYVALUE (276) 11
 
 
 Nonterminals, with rules where they appear
 
-$accept (14)
+$accept (22)
     on left: 0
-Programa (15)
+Programa (23)
     on left: 1, on right: 0
-KeyValuePairs (16)
-    on left: 2 3, on right: 1 3 11
-KeyValuePair (17)
-    on left: 4 5 6, on right: 2 3
-Value (18)
-    on left: 7 8 9 10 11, on right: 4 9
-Block (19)
-    on left: 12 13, on right: 5 6 13
+KeyValuePairs (24)
+    on left: 2 3, on right: 1 3 13
+KeyValuePair (25)
+    on left: 4 5 6 7, on right: 2 3
+Value (26)
+    on left: 8 9 10 11 12 13, on right: 4 7 10
+Block (27)
+    on left: 14 15, on right: 5 6 15
+Array (28)
+    on left: 16 17, on right: 12 17
+Entry (29)
+    on left: 18 19 20, on right: 16 17
 
 
-State 0
+state 0
 
     0 $accept: . Programa $end
 
@@ -76,177 +100,294 @@ State 0
     Programa  go to state 2
 
 
-State 1
+state 1
 
     1 Programa: START . KeyValuePairs
 
     OBJECT     shift, and go to state 3
-    PARAGRAPH  shift, and go to state 4
-    CONTENT    shift, and go to state 5
+    KEY        shift, and go to state 4
+    PARAGRAPH  shift, and go to state 5
+    CONTENT    shift, and go to state 6
 
-    KeyValuePairs  go to state 6
-    KeyValuePair   go to state 7
+    KeyValuePairs  go to state 7
+    KeyValuePair   go to state 8
 
 
-State 2
+state 2
 
     0 $accept: Programa . $end
 
-    $end  shift, and go to state 8
+    $end  shift, and go to state 9
 
 
-State 3
+state 3
 
-    4 KeyValuePair: OBJECT . Value
+    7 KeyValuePair: OBJECT . Value
 
     OBJECT     shift, and go to state 3
-    PARAGRAPH  shift, and go to state 4
-    CONTENT    shift, and go to state 5
-    lista      shift, and go to state 9
-    KEYVALUE   shift, and go to state 10
+    KEY        shift, and go to state 4
+    PARAGRAPH  shift, and go to state 5
+    CONTENT    shift, and go to state 6
+    ARRAY      shift, and go to state 10
+    list       shift, and go to state 11
+    KEYVALUE   shift, and go to state 12
 
-    OBJECT     [reduce using rule 7 (Value)]
-    PARAGRAPH  [reduce using rule 7 (Value)]
-    CONTENT    [reduce using rule 7 (Value)]
-    lista      [reduce using rule 7 (Value)]
-    $default   reduce using rule 7 (Value)
+    OBJECT     [reduce using rule 8 (Value)]
+    KEY        [reduce using rule 8 (Value)]
+    PARAGRAPH  [reduce using rule 8 (Value)]
+    CONTENT    [reduce using rule 8 (Value)]
+    list       [reduce using rule 8 (Value)]
+    $default   reduce using rule 8 (Value)
 
-    KeyValuePairs  go to state 11
-    KeyValuePair   go to state 7
-    Value          go to state 12
+    KeyValuePairs  go to state 13
+    KeyValuePair   go to state 8
+    Value          go to state 14
 
 
-State 4
+state 4
+
+    4 KeyValuePair: KEY . Value
+
+    OBJECT     shift, and go to state 3
+    KEY        shift, and go to state 4
+    PARAGRAPH  shift, and go to state 5
+    CONTENT    shift, and go to state 6
+    ARRAY      shift, and go to state 10
+    list       shift, and go to state 11
+    KEYVALUE   shift, and go to state 12
+
+    OBJECT     [reduce using rule 8 (Value)]
+    KEY        [reduce using rule 8 (Value)]
+    PARAGRAPH  [reduce using rule 8 (Value)]
+    CONTENT    [reduce using rule 8 (Value)]
+    list       [reduce using rule 8 (Value)]
+    $default   reduce using rule 8 (Value)
+
+    KeyValuePairs  go to state 13
+    KeyValuePair   go to state 8
+    Value          go to state 15
+
+
+state 5
 
     5 KeyValuePair: PARAGRAPH . Block
 
-    blockline  shift, and go to state 13
+    blockline  shift, and go to state 16
 
-    Block  go to state 14
+    Block  go to state 17
 
 
-State 5
+state 6
 
     6 KeyValuePair: CONTENT . Block
 
-    blockline  shift, and go to state 13
+    blockline  shift, and go to state 16
 
-    Block  go to state 15
+    Block  go to state 18
 
 
-State 6
+state 7
 
     1 Programa: START KeyValuePairs .
     3 KeyValuePairs: KeyValuePairs . KeyValuePair
 
     OBJECT     shift, and go to state 3
-    PARAGRAPH  shift, and go to state 4
-    CONTENT    shift, and go to state 5
+    KEY        shift, and go to state 4
+    PARAGRAPH  shift, and go to state 5
+    CONTENT    shift, and go to state 6
 
     $default  reduce using rule 1 (Programa)
 
-    KeyValuePair  go to state 16
+    KeyValuePair  go to state 19
 
 
-State 7
+state 8
 
     2 KeyValuePairs: KeyValuePair .
 
     $default  reduce using rule 2 (KeyValuePairs)
 
 
-State 8
+state 9
 
     0 $accept: Programa $end .
 
     $default  accept
 
 
-State 9
+state 10
 
-    8 Value: lista .
+   12 Value: ARRAY . Array
 
-    $default  reduce using rule 8 (Value)
+    NULLVALUE  shift, and go to state 20
+    BOOLEAN    shift, and go to state 21
+    ARRAYKEY   shift, and go to state 22
 
-
-State 10
-
-   10 Value: KEYVALUE .
-
-    $default  reduce using rule 10 (Value)
+    Array  go to state 23
+    Entry  go to state 24
 
 
-State 11
+state 11
+
+    9 Value: list .
+
+    $default  reduce using rule 9 (Value)
+
+
+state 12
+
+   11 Value: KEYVALUE .
+
+    $default  reduce using rule 11 (Value)
+
+
+state 13
 
     3 KeyValuePairs: KeyValuePairs . KeyValuePair
-   11 Value: KeyValuePairs .
+   13 Value: KeyValuePairs .
 
     OBJECT     shift, and go to state 3
-    PARAGRAPH  shift, and go to state 4
-    CONTENT    shift, and go to state 5
+    KEY        shift, and go to state 4
+    PARAGRAPH  shift, and go to state 5
+    CONTENT    shift, and go to state 6
 
-    OBJECT     [reduce using rule 11 (Value)]
-    PARAGRAPH  [reduce using rule 11 (Value)]
-    CONTENT    [reduce using rule 11 (Value)]
-    $default   reduce using rule 11 (Value)
+    OBJECT     [reduce using rule 13 (Value)]
+    KEY        [reduce using rule 13 (Value)]
+    PARAGRAPH  [reduce using rule 13 (Value)]
+    CONTENT    [reduce using rule 13 (Value)]
+    $default   reduce using rule 13 (Value)
 
-    KeyValuePair  go to state 16
+    KeyValuePair  go to state 19
 
 
-State 12
+state 14
 
-    4 KeyValuePair: OBJECT Value .
-    9 Value: Value . lista
+    7 KeyValuePair: OBJECT Value .
+   10 Value: Value . list
 
-    lista  shift, and go to state 17
+    list  shift, and go to state 25
 
-    lista     [reduce using rule 4 (KeyValuePair)]
+    list      [reduce using rule 7 (KeyValuePair)]
+    $default  reduce using rule 7 (KeyValuePair)
+
+
+state 15
+
+    4 KeyValuePair: KEY Value .
+   10 Value: Value . list
+
+    list  shift, and go to state 25
+
+    list      [reduce using rule 4 (KeyValuePair)]
     $default  reduce using rule 4 (KeyValuePair)
 
 
-State 13
+state 16
 
-   12 Block: blockline .
+   14 Block: blockline .
 
-    $default  reduce using rule 12 (Block)
+    $default  reduce using rule 14 (Block)
 
 
-State 14
+state 17
 
     5 KeyValuePair: PARAGRAPH Block .
-   13 Block: Block . blockline
+   15 Block: Block . blockline
 
-    blockline  shift, and go to state 18
+    blockline  shift, and go to state 26
 
     $default  reduce using rule 5 (KeyValuePair)
 
 
-State 15
+state 18
 
     6 KeyValuePair: CONTENT Block .
-   13 Block: Block . blockline
+   15 Block: Block . blockline
 
-    blockline  shift, and go to state 18
+    blockline  shift, and go to state 26
 
     $default  reduce using rule 6 (KeyValuePair)
 
 
-State 16
+state 19
 
     3 KeyValuePairs: KeyValuePairs KeyValuePair .
 
     $default  reduce using rule 3 (KeyValuePairs)
 
 
-State 17
+state 20
 
-    9 Value: Value lista .
+   18 Entry: NULLVALUE .
 
-    $default  reduce using rule 9 (Value)
+    $default  reduce using rule 18 (Entry)
 
 
-State 18
+state 21
 
-   13 Block: Block blockline .
+   19 Entry: BOOLEAN . BOOLVALUE
 
-    $default  reduce using rule 13 (Block)
+    BOOLVALUE  shift, and go to state 27
+
+
+state 22
+
+   20 Entry: ARRAYKEY . ARRAYVALUE
+
+    ARRAYVALUE  shift, and go to state 28
+
+
+state 23
+
+   12 Value: ARRAY Array .
+   17 Array: Array . Entry
+
+    NULLVALUE  shift, and go to state 20
+    BOOLEAN    shift, and go to state 21
+    ARRAYKEY   shift, and go to state 22
+
+    $default  reduce using rule 12 (Value)
+
+    Entry  go to state 29
+
+
+state 24
+
+   16 Array: Entry .
+
+    $default  reduce using rule 16 (Array)
+
+
+state 25
+
+   10 Value: Value list .
+
+    $default  reduce using rule 10 (Value)
+
+
+state 26
+
+   15 Block: Block blockline .
+
+    $default  reduce using rule 15 (Block)
+
+
+state 27
+
+   19 Entry: BOOLEAN BOOLVALUE .
+
+    $default  reduce using rule 19 (Entry)
+
+
+state 28
+
+   20 Entry: ARRAYKEY ARRAYVALUE .
+
+    $default  reduce using rule 20 (Entry)
+
+
+state 29
+
+   17 Array: Array Entry .
+
+    $default  reduce using rule 17 (Array)
