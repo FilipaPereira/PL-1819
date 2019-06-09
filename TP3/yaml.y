@@ -18,20 +18,23 @@
 %token<str> COLON
 %token<str> COMMA
 %token<str> lista
+%token<str> blockline
 %token<keyvalue> KEYVALUE
-%type<str> Value KeyValuePair KeyValuePairs
+%type<str> Value KeyValuePair KeyValuePairs Block
 
 
 %%
 Programa : START KeyValuePairs {printf("{ \n%s\n}\n",$2);}
-        ;
+         ;
 
 KeyValuePairs : KeyValuePair                   {$$=$1;}
-            | KeyValuePairs KeyValuePair   {asprintf(&$$, "%s\n%s",$1,$2);}
-            ;
+              | KeyValuePairs KeyValuePair     {asprintf(&$$, "%s\n%s",$1,$2);}
+              ;
 
 KeyValuePair : OBJECT Value          {asprintf(&$$, "\"%s\": [\n%s\n],",$1,$2);}
-            ;
+             | PARAGRAPH Block       {asprintf(&$$, "\"%s\": \"%s\\n\",",$1,$2);}
+             | CONTENT Block         {asprintf(&$$, "\"%s\": \"%s\\n\",",$1,$2);}
+             ;
 
 Value :
     | lista                         {asprintf(&$$, "%s",$1);}
@@ -46,6 +49,9 @@ Value :
                                       asprintf(&$$, "\"%s\": \"%s\"",values[0],values[1]);}
     | KeyValuePairs                 {asprintf(&$$, "%s",$1);}
     ;
+
+Block : blockline					{asprintf(&$$, "%s",$1);}
+      | Block blockline				{asprintf(&$$, "%s\\n%s",$1,$2);}
 
 %%
 
