@@ -22,54 +22,52 @@
 %token<str> BOOLEAN
 %token<str> BOOLVALUE
 %token<str> ARRAY
+%token<str> OBJECTKEY
+%token<str> OBJECTVALUE
 %token<str> ARRAYKEY
 %token<str> ARRAYVALUE
 %token<str> list
 %token<str> array
 %token<str> blockline
 %token<keyvalue> KEYVALUE
-%type<str> Value KeyValuePair KeyValuePairs Block Array Entry
+%type<str> KeyValuePair KeyValuePairs Block Array List KeyValue Object
 
 
 %%
-Programa : START KeyValuePairs {printf("{\n%s\n}\n",$2);}
+Programa : START KeyValuePairs       {printf("{\n%s\n}\n",$2);}
          ;
 
-KeyValuePairs : KeyValuePair                   {$$=$1;}
-              | KeyValuePairs KeyValuePair     {asprintf(&$$, "%s,\n%s",$1,$2);}
+KeyValuePairs : KeyValuePair                    {$$=$1;}
+              | KeyValuePairs KeyValuePair      {asprintf(&$$, "%s,\n%s",$1,$2);}
               ;
 
-KeyValuePair : KEY Value             {asprintf(&$$, "\"%s\": [\n%s\n]",$1,$2);}
-             | PARAGRAPH Block       {asprintf(&$$, "\"%s\": \"%s\\n\",",$1,$2);}
-             | CONTENT Block         {asprintf(&$$, "\"%s\": \"%s\\n\",",$1,$2);}
-             | OBJECT Value          {asprintf(&$$, "\"%s\": {\n  %s\n}",$1,$2);}
+KeyValuePair : KEY List                         {asprintf(&$$, "\"%s\": [\n%s\n]",$1,$2);}
+             | KEY Object                       {asprintf(&$$, "\"%s\": \"%s\"",$1,$2);}
+             | PARAGRAPH Block                  {asprintf(&$$, "\"%s\": \"%s\\n\",",$1,$2);}
+             | CONTENT Block                    {asprintf(&$$, "\"%s\": \"%s\\n\",",$1,$2);}
              ;
 
-Value :
-    | list                          {asprintf(&$$, "  \"%s\"",$1);}
-    | Value list                    {asprintf(&$$, "%s\n  \"%s\"",$1,$2);}
-    | KEYVALUE                      { char* tokens = strtok ($1,": ");
-                                      char* values[2];
-                                      values[0] = strdup(tokens);
-                                      tokens = strtok (NULL, ": ");
-                                      values[1] = strdup(tokens);
-                                      asprintf(&$$, "\"%s\": \"%s\"",values[0],values[1]);}
-    | ARRAY Array                   {asprintf(&$$, "\"%s\": [\n%s\n]",$1,$2);}
-    | KeyValuePairs                 {asprintf(&$$, "%s",$1);}
+Object : KeyValue                               {asprintf(&$$, "%s",$1);}
+        | Object KeyValue                       {asprintf(&$$, "%s\n%s",$1,$2);}
+        ;
+
+KeyValue : OBJECTKEY Array                      {asprintf(&$$, "%s\n%s",$1,$2);}
+        | OBJECTKEY OBJECTVALUE                 {asprintf(&$$, "%s\n%s",$1,$2);}
+        ;
+
+Array : ARRAYKEY ARRAYVALUE                     {asprintf(&$$, "{--\n%s %s\n}",$1,$2);}
+    | Array ARRAYKEY ARRAYVALUE                 {asprintf(&$$, "%s,%s%s",$1,$2,$3);}
     ;
 
-Block : blockline					{asprintf(&$$, "%s",$1);}
-      | Block blockline				{asprintf(&$$, "%s\\n%s",$1,$2);}
+
+List : list                                     {asprintf(&$$, "  \"%s\"",$1);}
+    | List list                                 {asprintf(&$$, "%s\n  \"%s\"",$1,$2);}
+    ;
+
+Block : blockline           					{asprintf(&$$, "%s",$1);}
+      | Block blockline	            			{asprintf(&$$, "%s\\n%s",$1,$2);}
       ;
 
-Array : Entry                       {asprintf(&$$, "{\n  %s\n}",$1);}
-      | Array Entry                 {asprintf(&$$, "%s,%s",$1,$2);}
-      ;
-
-Entry : NULLVALUE                   {asprintf(&$$, "\"%s\": null",$1);}
-      | BOOLEAN BOOLVALUE           {asprintf(&$$, "\"%s\": %s",$1,$2);}
-      | ARRAYKEY ARRAYVALUE         {asprintf(&$$, "\"%s\": %s",$1,$2);}
-      ;
 
 %%
 

@@ -52,12 +52,14 @@
      BOOLEAN = 268,
      BOOLVALUE = 269,
      ARRAY = 270,
-     ARRAYKEY = 271,
-     ARRAYVALUE = 272,
-     list = 273,
-     array = 274,
-     blockline = 275,
-     KEYVALUE = 276
+     OBJECTKEY = 271,
+     OBJECTVALUE = 272,
+     ARRAYKEY = 273,
+     ARRAYVALUE = 274,
+     list = 275,
+     array = 276,
+     blockline = 277,
+     KEYVALUE = 278
    };
 #endif
 /* Tokens.  */
@@ -74,12 +76,14 @@
 #define BOOLEAN 268
 #define BOOLVALUE 269
 #define ARRAY 270
-#define ARRAYKEY 271
-#define ARRAYVALUE 272
-#define list 273
-#define array 274
-#define blockline 275
-#define KEYVALUE 276
+#define OBJECTKEY 271
+#define OBJECTVALUE 272
+#define ARRAYKEY 273
+#define ARRAYVALUE 274
+#define list 275
+#define array 276
+#define blockline 277
+#define KEYVALUE 278
 
 
 
@@ -89,7 +93,7 @@ typedef union YYSTYPE
 #line 10 "yaml.y"
 {char* str; char* keyvalue;}
 /* Line 1529 of yacc.c.  */
-#line 93 "y.tab.h"
+#line 97 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
