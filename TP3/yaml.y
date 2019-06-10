@@ -7,30 +7,21 @@
     int yyerror(char* s);
 %}
 
-%union {char* str; char* keyvalue;}
+%union {char* str; char* key; char* arrayvalue;}
 
 %token<str> START
-%token<str> JSON
-%token<str> YAML
-%token<str> OBJECT
 %token<str> KEY
 %token<str> PARAGRAPH
 %token<str> CONTENT
-%token<str> COLON
-%token<str> COMMA
-%token<str> NULLVALUE
-%token<str> BOOLEAN
-%token<str> BOOLVALUE
-%token<str> ARRAY
 %token<str> OBJECTKEY
 %token<str> OBJECTVALUE
 %token<str> ARRAYKEY
 %token<str> ARRAYVALUE
 %token<str> list
-%token<str> array
 %token<str> blockline
+%token<str> contLine
 %token<keyvalue> KEYVALUE
-%type<str> KeyValuePair KeyValuePairs Block Array List KeyValue Object
+%type<str> KeyValuePair KeyValuePairs Block Array List KeyValue Object contBlock
 
 
 %%
@@ -42,32 +33,34 @@ KeyValuePairs : KeyValuePair                    {$$=$1;}
               ;
 
 KeyValuePair : KEY List                         {asprintf(&$$, "\"%s\": [\n%s\n]",$1,$2);}
-             | KEY Object                       {asprintf(&$$, "\"%s\": \"%s\"",$1,$2);}
-             | PARAGRAPH Block                  {asprintf(&$$, "\"%s\": \"%s\\n\",",$1,$2);}
-             | CONTENT Block                    {asprintf(&$$, "\"%s\": \"%s\\n\",",$1,$2);}
+| KEY Object                       {asprintf(&$$, "\"%s\":{\n\%s\n}",$1,$2);}
+| PARAGRAPH Block                  {asprintf(&$$, "\"%s\": \"%s\"",$1,$2);}
+| CONTENT contBlock                {asprintf(&$$, "\"%s\": \"%s\"",$1,$2);}
              ;
 
 Object : KeyValue                               {asprintf(&$$, "%s",$1);}
-        | Object KeyValue                       {asprintf(&$$, "%s\n%s",$1,$2);}
+        | Object KeyValue                       {asprintf(&$$, "%s,\n%s",$1,$2);}
         ;
 
-KeyValue : OBJECTKEY Array                      {asprintf(&$$, "%s\n%s",$1,$2);}
-        | OBJECTKEY OBJECTVALUE                 {asprintf(&$$, "%s\n%s",$1,$2);}
+KeyValue : OBJECTKEY Array                      {asprintf(&$$, "%s[\n%s\n]",$1,$2);}
+| OBJECTKEY OBJECTVALUE                 {asprintf(&$$, "\"%s\": \"%s\"",$1,$2);}
         ;
 
-Array : ARRAYKEY ARRAYVALUE                     {asprintf(&$$, "{--\n%s %s\n}",$1,$2);}
-    | Array ARRAYKEY ARRAYVALUE                 {asprintf(&$$, "%s,%s%s",$1,$2,$3);}
+Array : ARRAYKEY ARRAYVALUE                 {asprintf(&$$, "{\n%s%s\n}",$1,$2);}
+| Array ARRAYKEY ARRAYVALUE                 {asprintf(&$$, "%s,\n{\n%s %s\n}",$1,$2,$3);}
     ;
 
 
-List : list                                     {asprintf(&$$, "  \"%s\"",$1);}
+List : list                                     {$$=$1;}
     | List list                                 {asprintf(&$$, "%s\n  \"%s\"",$1,$2);}
     ;
 
-Block : blockline           					{asprintf(&$$, "%s",$1);}
-      | Block blockline	            			{asprintf(&$$, "%s\\n%s",$1,$2);}
-      ;
+Block : blockline                               {asprintf(&$$, "%s",$1);}
+| Block blockline                         {asprintf(&$$, "%s%s",$1,$2);}
+;
 
+contBlock : contLine                            {asprintf(&$$, "%s",$1);}
+| contBlock contLine                  {asprintf(&$$, "%s\\n%s",$1,$2);}
 
 %%
 

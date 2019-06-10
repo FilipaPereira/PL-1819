@@ -59,7 +59,8 @@
      list = 275,
      array = 276,
      blockline = 277,
-     KEYVALUE = 278
+     contLine = 278,
+     KEYVALUE = 279
    };
 #endif
 /* Tokens.  */
@@ -83,7 +84,8 @@
 #define list 275
 #define array 276
 #define blockline 277
-#define KEYVALUE 278
+#define contLine 278
+#define KEYVALUE 279
 
 
 
@@ -91,9 +93,9 @@
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
 #line 10 "yaml.y"
-{char* str; char* keyvalue;}
+{char* str; char* key; char* arrayvalue;}
 /* Line 1529 of yacc.c.  */
-#line 97 "y.tab.h"
+#line 99 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
