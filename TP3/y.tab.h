@@ -1,14 +1,13 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -33,74 +30,68 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Tokens.  */
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     START = 258,
-     JSON = 259,
-     YAML = 260,
-     OBJECT = 261,
-     KEY = 262,
-     PARAGRAPH = 263,
-     CONTENT = 264,
-     COLON = 265,
-     COMMA = 266,
-     NULLVALUE = 267,
-     BOOLEAN = 268,
-     BOOLVALUE = 269,
-     ARRAY = 270,
-     OBJECTKEY = 271,
-     OBJECTVALUE = 272,
-     ARRAYKEY = 273,
-     ARRAYVALUE = 274,
-     list = 275,
-     array = 276,
-     blockline = 277,
-     contLine = 278,
-     KEYVALUE = 279
-   };
+  enum yytokentype
+  {
+    START = 258,
+    KEY = 259,
+    KEYVALUE = 260,
+    PARAGRAPH = 261,
+    CONTENT = 262,
+    OBJECTKEY = 263,
+    OBJECTVALUE = 264,
+    ARRAYKEY = 265,
+    ARRAYVALUE = 266,
+    list = 267,
+    blockline = 268,
+    contLine = 269
+  };
 #endif
 /* Tokens.  */
 #define START 258
-#define JSON 259
-#define YAML 260
-#define OBJECT 261
-#define KEY 262
-#define PARAGRAPH 263
-#define CONTENT 264
-#define COLON 265
-#define COMMA 266
-#define NULLVALUE 267
-#define BOOLEAN 268
-#define BOOLVALUE 269
-#define ARRAY 270
-#define OBJECTKEY 271
-#define OBJECTVALUE 272
-#define ARRAYKEY 273
-#define ARRAYVALUE 274
-#define list 275
-#define array 276
-#define blockline 277
-#define contLine 278
-#define KEYVALUE 279
+#define KEY 259
+#define KEYVALUE 260
+#define PARAGRAPH 261
+#define CONTENT 262
+#define OBJECTKEY 263
+#define OBJECTVALUE 264
+#define ARRAYKEY 265
+#define ARRAYVALUE 266
+#define list 267
+#define blockline 268
+#define contLine 269
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 10 "yaml.y"
-{char* str; char* key; char* arrayvalue;}
-/* Line 1529 of yacc.c.  */
-#line 99 "y.tab.h"
-	YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
+
+union YYSTYPE
+{
+#line 9 "yaml.y" /* yacc.c:1909  */
+char* str; char* key; char* arrayvalue;
+
+#line 85 "y.tab.h" /* yacc.c:1909  */
+};
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
+
 
 extern YYSTYPE yylval;
 
+int yyparse (void);
+
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

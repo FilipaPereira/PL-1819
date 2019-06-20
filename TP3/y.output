@@ -1,18 +1,3 @@
-Terminals which are not used
-
-   JSON
-   YAML
-   OBJECT
-   COLON
-   COMMA
-   NULLVALUE
-   BOOLEAN
-   BOOLVALUE
-   ARRAY
-   array
-   KEYVALUE
-
-
 Grammar
 
     0 $accept: Programa $end
@@ -26,24 +11,25 @@ Grammar
     5             | KEY Object
     6             | PARAGRAPH Block
     7             | CONTENT contBlock
+    8             | KEYVALUE
 
-    8 Object: KeyValue
-    9       | Object KeyValue
+    9 Object: KeyValue
+   10       | Object KeyValue
 
-   10 KeyValue: OBJECTKEY Array
-   11         | OBJECTKEY OBJECTVALUE
+   11 KeyValue: OBJECTKEY Array
+   12         | OBJECTKEY OBJECTVALUE
 
-   12 Array: ARRAYKEY ARRAYVALUE
-   13      | Array ARRAYKEY ARRAYVALUE
+   13 Array: ARRAYKEY ARRAYVALUE
+   14      | Array ARRAYKEY ARRAYVALUE
 
-   14 List: list
-   15     | List list
+   15 List: list
+   16     | List list
 
-   16 Block: blockline
-   17      | Block blockline
+   17 Block: blockline
+   18      | Block blockline
 
-   18 contBlock: contLine
-   19          | contBlock contLine
+   19 contBlock: contLine
+   20          | contBlock contLine
 
 
 Terminals, with rules where they appear
@@ -51,54 +37,44 @@ Terminals, with rules where they appear
 $end (0) 0
 error (256)
 START (258) 1
-JSON (259)
-YAML (260)
-OBJECT (261)
-KEY (262) 4 5
-PARAGRAPH (263) 6
-CONTENT (264) 7
-COLON (265)
-COMMA (266)
-NULLVALUE (267)
-BOOLEAN (268)
-BOOLVALUE (269)
-ARRAY (270)
-OBJECTKEY (271) 10 11
-OBJECTVALUE (272) 11
-ARRAYKEY (273) 12 13
-ARRAYVALUE (274) 12 13
-list (275) 14 15
-array (276)
-blockline (277) 16 17
-contLine (278) 18 19
-KEYVALUE (279)
+KEY (259) 4 5
+KEYVALUE (260) 8
+PARAGRAPH (261) 6
+CONTENT (262) 7
+OBJECTKEY (263) 11 12
+OBJECTVALUE (264) 12
+ARRAYKEY (265) 13 14
+ARRAYVALUE (266) 13 14
+list (267) 15 16
+blockline (268) 17 18
+contLine (269) 19 20
 
 
 Nonterminals, with rules where they appear
 
-$accept (25)
+$accept (15)
     on left: 0
-Programa (26)
+Programa (16)
     on left: 1, on right: 0
-KeyValuePairs (27)
+KeyValuePairs (17)
     on left: 2 3, on right: 1 3
-KeyValuePair (28)
-    on left: 4 5 6 7, on right: 2 3
-Object (29)
-    on left: 8 9, on right: 5 9
-KeyValue (30)
-    on left: 10 11, on right: 8 9
-Array (31)
-    on left: 12 13, on right: 10 13
-List (32)
-    on left: 14 15, on right: 4 15
-Block (33)
-    on left: 16 17, on right: 6 17
-contBlock (34)
-    on left: 18 19, on right: 7 19
+KeyValuePair (18)
+    on left: 4 5 6 7 8, on right: 2 3
+Object (19)
+    on left: 9 10, on right: 5 10
+KeyValue (20)
+    on left: 11 12, on right: 9 10
+Array (21)
+    on left: 13 14, on right: 11 14
+List (22)
+    on left: 15 16, on right: 4 16
+Block (23)
+    on left: 17 18, on right: 6 18
+contBlock (24)
+    on left: 19 20, on right: 7 20
 
 
-state 0
+State 0
 
     0 $accept: . Programa $end
 
@@ -107,240 +83,249 @@ state 0
     Programa  go to state 2
 
 
-state 1
+State 1
 
     1 Programa: START . KeyValuePairs
 
     KEY        shift, and go to state 3
-    PARAGRAPH  shift, and go to state 4
-    CONTENT    shift, and go to state 5
+    KEYVALUE   shift, and go to state 4
+    PARAGRAPH  shift, and go to state 5
+    CONTENT    shift, and go to state 6
 
-    KeyValuePairs  go to state 6
-    KeyValuePair   go to state 7
+    KeyValuePairs  go to state 7
+    KeyValuePair   go to state 8
 
 
-state 2
+State 2
 
     0 $accept: Programa . $end
 
-    $end  shift, and go to state 8
+    $end  shift, and go to state 9
 
 
-state 3
+State 3
 
     4 KeyValuePair: KEY . List
     5             | KEY . Object
 
-    OBJECTKEY  shift, and go to state 9
-    list       shift, and go to state 10
+    OBJECTKEY  shift, and go to state 10
+    list       shift, and go to state 11
 
-    Object    go to state 11
-    KeyValue  go to state 12
-    List      go to state 13
+    Object    go to state 12
+    KeyValue  go to state 13
+    List      go to state 14
 
 
-state 4
+State 4
+
+    8 KeyValuePair: KEYVALUE .
+
+    $default  reduce using rule 8 (KeyValuePair)
+
+
+State 5
 
     6 KeyValuePair: PARAGRAPH . Block
 
-    blockline  shift, and go to state 14
+    blockline  shift, and go to state 15
 
-    Block  go to state 15
+    Block  go to state 16
 
 
-state 5
+State 6
 
     7 KeyValuePair: CONTENT . contBlock
 
-    contLine  shift, and go to state 16
+    contLine  shift, and go to state 17
 
-    contBlock  go to state 17
+    contBlock  go to state 18
 
 
-state 6
+State 7
 
     1 Programa: START KeyValuePairs .
     3 KeyValuePairs: KeyValuePairs . KeyValuePair
 
     KEY        shift, and go to state 3
-    PARAGRAPH  shift, and go to state 4
-    CONTENT    shift, and go to state 5
+    KEYVALUE   shift, and go to state 4
+    PARAGRAPH  shift, and go to state 5
+    CONTENT    shift, and go to state 6
 
     $default  reduce using rule 1 (Programa)
 
-    KeyValuePair  go to state 18
+    KeyValuePair  go to state 19
 
 
-state 7
+State 8
 
     2 KeyValuePairs: KeyValuePair .
 
     $default  reduce using rule 2 (KeyValuePairs)
 
 
-state 8
+State 9
 
     0 $accept: Programa $end .
 
     $default  accept
 
 
-state 9
+State 10
 
-   10 KeyValue: OBJECTKEY . Array
-   11         | OBJECTKEY . OBJECTVALUE
+   11 KeyValue: OBJECTKEY . Array
+   12         | OBJECTKEY . OBJECTVALUE
 
-    OBJECTVALUE  shift, and go to state 19
-    ARRAYKEY     shift, and go to state 20
+    OBJECTVALUE  shift, and go to state 20
+    ARRAYKEY     shift, and go to state 21
 
-    Array  go to state 21
-
-
-state 10
-
-   14 List: list .
-
-    $default  reduce using rule 14 (List)
+    Array  go to state 22
 
 
-state 11
+State 11
+
+   15 List: list .
+
+    $default  reduce using rule 15 (List)
+
+
+State 12
 
     5 KeyValuePair: KEY Object .
-    9 Object: Object . KeyValue
+   10 Object: Object . KeyValue
 
-    OBJECTKEY  shift, and go to state 9
+    OBJECTKEY  shift, and go to state 10
 
     $default  reduce using rule 5 (KeyValuePair)
 
-    KeyValue  go to state 22
+    KeyValue  go to state 23
 
 
-state 12
+State 13
 
-    8 Object: KeyValue .
+    9 Object: KeyValue .
 
-    $default  reduce using rule 8 (Object)
+    $default  reduce using rule 9 (Object)
 
 
-state 13
+State 14
 
     4 KeyValuePair: KEY List .
-   15 List: List . list
+   16 List: List . list
 
-    list  shift, and go to state 23
+    list  shift, and go to state 24
 
     $default  reduce using rule 4 (KeyValuePair)
 
 
-state 14
+State 15
 
-   16 Block: blockline .
+   17 Block: blockline .
 
-    $default  reduce using rule 16 (Block)
+    $default  reduce using rule 17 (Block)
 
 
-state 15
+State 16
 
     6 KeyValuePair: PARAGRAPH Block .
-   17 Block: Block . blockline
+   18 Block: Block . blockline
 
-    blockline  shift, and go to state 24
+    blockline  shift, and go to state 25
 
     $default  reduce using rule 6 (KeyValuePair)
 
 
-state 16
+State 17
 
-   18 contBlock: contLine .
+   19 contBlock: contLine .
 
-    $default  reduce using rule 18 (contBlock)
+    $default  reduce using rule 19 (contBlock)
 
 
-state 17
+State 18
 
     7 KeyValuePair: CONTENT contBlock .
-   19 contBlock: contBlock . contLine
+   20 contBlock: contBlock . contLine
 
-    contLine  shift, and go to state 25
+    contLine  shift, and go to state 26
 
     $default  reduce using rule 7 (KeyValuePair)
 
 
-state 18
+State 19
 
     3 KeyValuePairs: KeyValuePairs KeyValuePair .
 
     $default  reduce using rule 3 (KeyValuePairs)
 
 
-state 19
+State 20
 
-   11 KeyValue: OBJECTKEY OBJECTVALUE .
+   12 KeyValue: OBJECTKEY OBJECTVALUE .
+
+    $default  reduce using rule 12 (KeyValue)
+
+
+State 21
+
+   13 Array: ARRAYKEY . ARRAYVALUE
+
+    ARRAYVALUE  shift, and go to state 27
+
+
+State 22
+
+   11 KeyValue: OBJECTKEY Array .
+   14 Array: Array . ARRAYKEY ARRAYVALUE
+
+    ARRAYKEY  shift, and go to state 28
 
     $default  reduce using rule 11 (KeyValue)
 
 
-state 20
+State 23
 
-   12 Array: ARRAYKEY . ARRAYVALUE
+   10 Object: Object KeyValue .
 
-    ARRAYVALUE  shift, and go to state 26
-
-
-state 21
-
-   10 KeyValue: OBJECTKEY Array .
-   13 Array: Array . ARRAYKEY ARRAYVALUE
-
-    ARRAYKEY  shift, and go to state 27
-
-    $default  reduce using rule 10 (KeyValue)
+    $default  reduce using rule 10 (Object)
 
 
-state 22
+State 24
 
-    9 Object: Object KeyValue .
+   16 List: List list .
 
-    $default  reduce using rule 9 (Object)
-
-
-state 23
-
-   15 List: List list .
-
-    $default  reduce using rule 15 (List)
+    $default  reduce using rule 16 (List)
 
 
-state 24
+State 25
 
-   17 Block: Block blockline .
+   18 Block: Block blockline .
 
-    $default  reduce using rule 17 (Block)
-
-
-state 25
-
-   19 contBlock: contBlock contLine .
-
-    $default  reduce using rule 19 (contBlock)
+    $default  reduce using rule 18 (Block)
 
 
-state 26
+State 26
 
-   12 Array: ARRAYKEY ARRAYVALUE .
+   20 contBlock: contBlock contLine .
 
-    $default  reduce using rule 12 (Array)
-
-
-state 27
-
-   13 Array: Array ARRAYKEY . ARRAYVALUE
-
-    ARRAYVALUE  shift, and go to state 28
+    $default  reduce using rule 20 (contBlock)
 
 
-state 28
+State 27
 
-   13 Array: Array ARRAYKEY ARRAYVALUE .
+   13 Array: ARRAYKEY ARRAYVALUE .
 
     $default  reduce using rule 13 (Array)
+
+
+State 28
+
+   14 Array: Array ARRAYKEY . ARRAYVALUE
+
+    ARRAYVALUE  shift, and go to state 29
+
+
+State 29
+
+   14 Array: Array ARRAYKEY ARRAYVALUE .
+
+    $default  reduce using rule 14 (Array)

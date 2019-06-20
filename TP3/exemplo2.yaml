@@ -1,0 +1,13 @@
+---
+
+json:
+  - rigid
+yaml:
+  - slim and flexible
+  - better for configuration
+stuff: here
+content: |
+   We
+   love
+   Language
+   Processing

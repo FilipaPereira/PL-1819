@@ -10,11 +10,14 @@ json:
 yaml:
   - duh
 object:
-	key: value
+  key: value
   array:
     - null_value:
     - boolean: true
-    - integer: 1
+    - array:
+      - null_value:
+      - boolean: true
+      - integer: 1
 paragraph: >
    Blank lines denote
 
